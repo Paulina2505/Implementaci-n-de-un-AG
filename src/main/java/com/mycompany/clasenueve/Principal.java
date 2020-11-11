@@ -16,21 +16,22 @@ public class Principal {
     private static double[] fitness;
     private static double probabilidadCruza = 0.7;
     private static double probabilidadMutacion = 0.3;
-    private static int individuos = 2;
+    private static int individuos = 10;
     private static int genes = 4;
     
     public static void main(String[] args) {
         generarPoblacionInicial();
         fitness = new double[individuos];
-        for (int j = 0; j < fitness.length; j++){ fitness[j] = fitness(decimales[j]); System.out.println(fitness[j]);}
+        for (int j = 0; j < fitness.length; j++){ fitness[j] = fitness(decimales[j]); /*System.out.println(fitness[j]);*/}
         for (int i = 0; i < genes*individuos; i++) {
             int papa = papaMenor();
             int mama = mamaMenor(papa);
             cruza(papa,mama);
             mutacion(papa,mama);
             for (int j = 0; j < individuos; j++) decimales[j] = binarioToDecimal(binarios[j]);
-            for (int j = 0; j < fitness.length; j++){ fitness[j] = fitness(decimales[j]); System.out.println(fitness[j]);}
+            for (int j = 0; j < fitness.length; j++){ fitness[j] = fitness(decimales[j]); /*System.out.println(fitness[j]);*/}
         }
+        System.out.println("RESULTADO: "+fitness(decimales[papaMenor()]));
     }
     
     public static void generarPoblacionInicial() {
@@ -123,49 +124,40 @@ public class Principal {
     
     public static void cruza(int posicionPapa, int posicionMama) {
         if (Math.random() < probabilidadCruza) {
-            int punto = (int) Math.floor(Math.random()*genes);
             char[] binarioPapa = binarios[posicionPapa].toCharArray();
             char[] binarioMama = binarios[posicionMama].toCharArray();
             String cadena = "";
-            for (int i = 0; i < genes; i++) {
-                if (i == punto) {
-                    cadena += binarioMama[punto];
-                } else {
-                    cadena += binarioPapa[i];
-                }
-            }
-            binarios[posicionPapa] = cadena;
-            cadena = "";
-            for (int i = 0; i < genes; i++) {
-                if (i == punto) {
-                    cadena += binarioPapa[punto];
-                } else {
-                    cadena += binarioMama[i];
-                }
-            }
-            binarios[posicionMama] = cadena;
+            int cruza = Math.round(binarioPapa.length/2);
+            for (int i = 0; i < cruza; i++) cadena += binarioPapa[i];
+            cruza = binarioMama.length - cruza;
+            for (int i = cruza; i < binarioMama.length; i++) cadena += binarioMama[i];
+            //System.out.println("papa: "+binarios[posicionPapa]+"  mama: "+binarios[posicionMama]+"  nuevo fitness de cruza "+cadena);
+            //System.out.println("papa: "+fitness(decimales[posicionPapa])+"  mama: "+fitness(decimales[posicionMama])+"  nuevo fitness de cruza "+fitness(binarioToDecimal(cadena)));
+            binarios[0] = cadena;
         }
 
     }
     
     public static void mutacion(int posicionPapa, int posicionMama) {
-        char[] binarioPapa = binarios[posicionPapa].toCharArray();
-        char[] binarioMama = binarios[posicionMama].toCharArray();
-        String cadena = "";
-        //papa
-        for (int i = 0; i < genes; i++) {
-            if (Math.random() < probabilidadMutacion) {
-                if (binarioPapa[i] == '0') cadena += '1'; else cadena += '0';
-            } else cadena += binarioPapa[i];
+        if (Math.random() < probabilidadMutacion) {
+            //System.out.println("papa antes: "+binarios[posicionPapa]+" "+fitness(decimales[posicionPapa]));
+            char[] binarioPapa = binarios[posicionPapa].toCharArray();
+            int a = (binarioPapa.length) -1;
+            int posicion = (int) Math.round(Math.random() * a);
+            if (binarioPapa[posicion] == '0') binarioPapa[posicion] = '1'; else binarioPapa[posicion] = '0';
+            binarios[1] = String.valueOf(binarioPapa);
+            //System.out.println("papa después: "+binarios[1]+" "+fitness(binarioToDecimal(binarios[1])));
+            }
+        if (Math.random() < probabilidadMutacion) {
+            //System.out.println("mama antes: "+binarios[posicionMama]+" "+fitness(decimales[posicionMama]));
+            char[] binarioMama = binarios[posicionMama].toCharArray();
+            int a = (binarioMama.length) -1;
+            int posicion = (int) Math.round(Math.random() * a);
+            if (binarioMama[posicion] == '0') binarioMama[posicion] = '1'; else binarioMama[posicion] = '0';
+            binarios[2] = String.valueOf(binarioMama);
+            //System.out.println("mama despues: "+binarios[2]+" "+fitness(binarioToDecimal(binarios[2])));
+            
         }
-        binarios[posicionPapa] = cadena;
-        //mama
-        cadena = "";
-        for (int i = 0; i < genes; i++) {
-            if (Math.random() < probabilidadMutacion) {
-                if (binarioMama[i] == '0') cadena += '1'; else cadena += '0';
-            } else cadena += binarioMama[i];
-        }
-        binarios[posicionMama] = cadena;
+        
     }
 }
